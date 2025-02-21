@@ -1,0 +1,34 @@
+name: finguard
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^3.11.0
+  carousel_slider: ^5.0.0
+  cupertino_icons: ^1.0.8
+  firebase_auth: ^5.4.2
+  flutter_launcher_icons: ^0.14.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/Images/app_logo.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/Images/logo5.png
+    - assets/Images/h1.jpg
+    - assets/Images/h2.jpg
+    - assets/Images/h3.jpg
