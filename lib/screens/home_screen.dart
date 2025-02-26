@@ -9,113 +9,49 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("HSTU DigiFund"),
+        title: const Text("HSTU DigiFund"),
         backgroundColor: Colors.teal,
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications),
             onPressed: () {},
           ),
         ],
       ),
-      body: ListView( // Replace the body with a ListView to make it scrollable
+      body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          // Carousel Slider
           carouselSlider(),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-          Text("Featured Fundraiser", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
+          sectionTitle("Featured Fundraiser"),
           featuredFundraiser(),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-          Text("Fundraiser Categories", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          SizedBox(
-            height: 100,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                categoryCard("Education", Icons.school),
-                categoryCard("Medical", Icons.local_hospital),
-                categoryCard("Emergency", Icons.warning),
-                categoryCard("Clubs", Icons.groups),
-                categoryCard("Sports", Icons.sports_soccer),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
+          sectionTitle("Fundraiser Categories"),
+          categoryList(),
+          const SizedBox(height: 20),
 
-          Text("Ongoing Fundraisers", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          ListView.builder(
-            shrinkWrap: true, // Ensures it takes only the needed space
-            physics: NeverScrollableScrollPhysics(), // Disable scrolling here
-            itemCount: 3,
-            itemBuilder: (context, index) => fundraiserCard(),
-          ),
-          SizedBox(height: 20),
+          sectionTitle("Ongoing Fundraisers"),
+          fundraiserList(),
+          const SizedBox(height: 20),
 
-          Text("Recent Donations", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          sectionTitle("Recent Donations"),
           recentDonations(),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {},
-      //   child: Icon(Icons.favorite),
-      //   backgroundColor: Colors.teal,
-      // ),
-      drawer: Drawer(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () async {
-                  await _auth.signOut();
-                  Navigator.pushNamed(context, '/login');
-                },
-                child: Text('Log Out'),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.teal,
-        shape: CircularNotchedRectangle(), // Optional: Adds a floating effect
-        notchMargin: 6.0, // Space around the notch
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                // Navigate to Home
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.list),
-              onPressed: () {
-                // Navigate to Requests
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.person),
-              onPressed: () {
-                // Navigate to Profile
-              },
-            ),
-          ],
-        ),
-      ),
-
+      drawer: appDrawer(context),
+      bottomNavigationBar: bottomNavBar(),
     );
   }
 
-  // Carousel Slider Widget
+  Widget sectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    );
+  }
+
   Widget carouselSlider() {
     return CarouselSlider(
       options: CarouselOptions(
@@ -138,10 +74,26 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget categoryList() {
+    return SizedBox(
+      height: 100,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          categoryCard("Education", Icons.school),
+          categoryCard("Medical", Icons.local_hospital),
+          categoryCard("Emergency", Icons.warning),
+          categoryCard("Clubs", Icons.groups),
+          categoryCard("Sports", Icons.sports_soccer),
+        ],
+      ),
+    );
+  }
+
   Widget categoryCard(String title, IconData icon) {
     return Container(
-      margin: EdgeInsets.only(right: 10),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.teal,
         borderRadius: BorderRadius.circular(10),
@@ -150,29 +102,38 @@ class HomeScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: Colors.white, size: 30),
-          SizedBox(height: 5),
-          Text(title, style: TextStyle(color: Colors.white)),
+          const SizedBox(height: 5),
+          Text(title, style: const TextStyle(color: Colors.white)),
         ],
       ),
+    );
+  }
+
+  Widget fundraiserList() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 3,
+      itemBuilder: (context, index) => fundraiserCard(),
     );
   }
 
   Widget fundraiserCard() {
     return Card(
       child: ListTile(
-        leading: Icon(Icons.monetization_on, color: Colors.teal),
-        title: Text("Student Medical Aid"),
+        leading: const Icon(Icons.monetization_on, color: Colors.teal),
+        title: const Text("Student Medical Aid"),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Raised: \$500 / Goal: \$1000"),
-            SizedBox(height: 5),
-            LinearProgressIndicator(value: 0.5, color: Colors.teal),
+            const Text("Raised: \$500 / Goal: \$1000"),
+            const SizedBox(height: 5),
+            const LinearProgressIndicator(value: 0.5, color: Colors.teal),
           ],
         ),
         trailing: ElevatedButton(
           onPressed: () {},
-          child: Text("Donate"),
+          child: const Text("Donate"),
         ),
       ),
     );
@@ -182,11 +143,11 @@ class HomeScreen extends StatelessWidget {
     return Card(
       color: Colors.amber,
       child: ListTile(
-        title: Text("Urgent Medical Assistance Needed", style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text("Help a student with emergency surgery!"),
+        title: const Text("Urgent Medical Assistance Needed", style: TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: const Text("Help a student with emergency surgery!"),
         trailing: ElevatedButton(
           onPressed: () {},
-          child: Text("Support Now"),
+          child: const Text("Support Now"),
         ),
       ),
     );
@@ -194,7 +155,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget recentDonations() {
     return Column(
-      children: [
+      children: const [
         ListTile(
           leading: Icon(Icons.person, color: Colors.teal),
           title: Text("Samaun Islam \$50"),
@@ -202,10 +163,55 @@ class HomeScreen extends StatelessWidget {
         ),
         ListTile(
           leading: Icon(Icons.person, color: Colors.teal),
-          title: Text("Hasnain  \$30"),
+          title: Text("Hasnain \$30"),
           subtitle: Text("5 hours ago"),
         ),
       ],
+    );
+  }
+
+  Widget appDrawer(BuildContext context) {
+    return Drawer(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () async {
+                await _auth.signOut();
+                Navigator.pushNamed(context, '/login');
+              },
+              child: const Text('Log Out'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget bottomNavBar() {
+    return BottomAppBar(
+      color: Colors.teal,
+      shape: const CircularNotchedRectangle(),
+      notchMargin: 6.0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.list),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {},
+          ),
+        ],
+      ),
     );
   }
 }
