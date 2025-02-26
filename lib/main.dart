@@ -6,6 +6,7 @@ import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
