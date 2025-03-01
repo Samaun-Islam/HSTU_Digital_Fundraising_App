@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import at the top
 import 'profile_screen.dart';
 import 'App_Drawer.dart';
+import 'donation_request_page.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -81,11 +82,29 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(icon: Icon(Icons.home, color: Colors.white), onPressed: () {}),
-            IconButton(icon: Icon(Icons.list, color: Colors.white), onPressed: () {}),
-            IconButton(icon: Icon(Icons.person, color: Colors.white), onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
-            }),
+            IconButton(
+              icon: Icon(Icons.home, color: Colors.white),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.list, color: Colors.white),
+              onPressed: () {
+                // Navigate to the DonationRequestPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DonationRequestPage()),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.person, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -133,23 +152,54 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget featuredEmergencyFundraiser() {
+    int raised = 5000; // Example raised amount
+    int goal = 10000; // Example goal amount
+    bool isCompleted = raised >= goal; // Check if the goal is met or exceeded
+
     return Card(
       elevation: 4, // Add shadow
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
       color: Colors.redAccent,
       child: ListTile(
         title: Text("Emergency: Help for Flood Victims", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        subtitle: Text("Raised: \$5000 / Goal: \$10000", style: TextStyle(color: Colors.white70)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Raised: \$$raised / Goal: \$$goal", style: TextStyle(color: Colors.white70)),
+            SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: raised / goal, // Progress value (raised / goal)
+              backgroundColor: Colors.white.withOpacity(0.3), // Background color of the progress bar
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white), // Progress bar color
+            ),
+            if (isCompleted) // Show completion status if the goal is met
+              Container(
+                margin: EdgeInsets.only(top: 8),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green, // Green background for completion status
+                  borderRadius: BorderRadius.circular(12), // Rounded corners
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check, color: Colors.white, size: 16), // Tick mark icon
+                    SizedBox(width: 4),
+                    Text("Completed", style: TextStyle(color: Colors.white)), // "Completed" text
+                  ],
+                ),
+              ),
+          ],
+        ),
         trailing: ElevatedButton(
           onPressed: () {
-            showDonationDialog({"name": "Help for Flood Victims", "raised": 5000, "goal": 10000});
+            showDonationDialog({"name": "Help for Flood Victims", "raised": raised, "goal": goal});
           },
           child: Text("Donate"),
         ),
       ),
     );
   }
-
   Widget categorySelector() {
     return Wrap(
       spacing: 8.0,
@@ -172,12 +222,44 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget ongoingFundraisers() {
     return Column(
       children: fundraisers.where((fundraiser) => selectedCategory == "All" || fundraiser["category"] == selectedCategory).map((fundraiser) {
+        int raised = fundraiser["raised"];
+        int goal = fundraiser["goal"];
+        bool isCompleted = raised >= goal;
+
         return Card(
-          elevation: 4, // Add shadow
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: ListTile(
             title: Text(fundraiser["name"]),
-            subtitle: Text("Raised: \$${fundraiser["raised"]} / Goal: \$${fundraiser["goal"]}"),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Raised: \$$raised / Goal: \$$goal"),
+                SizedBox(height: 8),
+                LinearProgressIndicator(
+                  value: raised / goal,
+                  backgroundColor: Colors.teal.withOpacity(0.3),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
+                ),
+                if (isCompleted)
+                  Container(
+                    margin: EdgeInsets.only(top: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.check, color: Colors.white, size: 16),
+                        SizedBox(width: 4),
+                        Text("Completed", style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
             trailing: ElevatedButton(
               onPressed: () {
                 showDonationDialog(fundraiser);
