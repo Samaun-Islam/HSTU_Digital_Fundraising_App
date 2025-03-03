@@ -79,7 +79,7 @@ class AppDrawer extends StatelessWidget {
               icon: Icons.language,
               title: "Visit Our Website",
               onTap: () async {
-                const url = "https://hstu.ac.bd/"; // Replace with your website URL
+                const url = "https://hstu.ac.bd/"; //
                 if (await canLaunch(url)) {
                   await launch(url);
                 } else {
@@ -95,7 +95,7 @@ class AppDrawer extends StatelessWidget {
               icon: Icons.email,
               title: "Email Us",
               onTap: () async {
-                const email = "samaunislamsis0000@gmail.com"; // Replace with your email
+                const email = "samaunislamsis0000@gmail.com";
                 final Uri emailUri = Uri(
                   scheme: 'mailto',
                   path: email,
@@ -115,7 +115,7 @@ class AppDrawer extends StatelessWidget {
               icon: Icons.phone,
               title: "Call Us",
               onTap: () async {
-                const phoneNumber = "01701399755"; // Replace with your phone number
+                const phoneNumber = "01701399755";
                 final Uri phoneUri = Uri(
                   scheme: 'tel',
                   path: phoneNumber,

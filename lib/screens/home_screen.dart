@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import at the top
 import 'profile_screen.dart';
 import 'App_Drawer.dart';
 import 'donation_request_page.dart';
+import 'donation_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -193,13 +192,22 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         trailing: ElevatedButton(
           onPressed: () {
-            showDonationDialog({"name": "Help for Flood Victims", "raised": raised, "goal": goal});
+            DonationDialog(
+              context: context,
+              firestore: _firestore,
+              onDonationSuccess: (donation) {
+                setState(() {
+                  recentDonationsList.insert(0, donation);
+                });
+              },
+            ).showDonationDialog({"name": "Help for Flood Victims", "raised": raised, "goal": goal});
           },
           child: Text("Donate"),
         ),
       ),
     );
   }
+
   Widget categorySelector() {
     return Wrap(
       spacing: 8.0,
@@ -262,7 +270,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             trailing: ElevatedButton(
               onPressed: () {
-                showDonationDialog(fundraiser);
+                DonationDialog(
+                  context: context,
+                  firestore: _firestore,
+                  onDonationSuccess: (donation) {
+                    setState(() {
+                      recentDonationsList.insert(0, donation);
+                    });
+                  },
+                ).showDonationDialog(fundraiser);
               },
               child: Text("Donate"),
             ),
@@ -288,121 +304,5 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }).toList(),
     );
-  }
-
-  void showDonationDialog(Map<String, dynamic> fundraiser) {
-    TextEditingController amountController = TextEditingController();
-    TextEditingController nameController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Donate to ${fundraiser["name"]}"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text("Raised: \$${fundraiser["raised"]} / Goal: \$${fundraiser["goal"]}"),
-              SizedBox(height: 10),
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: "Enter your name", border: OutlineInputBorder()),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: "Enter donation amount", border: OutlineInputBorder()),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  // Simulate bKash payment process
-                  _processBkashPayment(amountController.text.trim());
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple, // bKash brand color
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.payment, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text("Pay with bKash", style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                String amount = amountController.text.trim();
-                String donorName = nameController.text.trim();
-                if (amount.isNotEmpty && donorName.isNotEmpty) {
-                  // Update the raised amount in the fundraiser
-                  int donationAmount = int.tryParse(amount) ?? 0;
-                  int currentRaised = fundraiser["raised"];
-                  fundraiser["raised"] = currentRaised + donationAmount;
-
-                  // Save to Firestore
-                  await _firestore.collection('donations').add({
-                    'name': donorName,
-                    'amount': amount,
-                    'date': DateTime.now(),
-                    'fundraiser': fundraiser["name"],
-                    'paymentMethod': 'bKash', // Add payment method
-                  });
-
-                  // Update the local state
-                  setState(() {
-                    recentDonationsList.insert(0, {
-                      "name": donorName,
-                      "amount": amount,
-                      "date": DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-                    });
-                  });
-
-                  Navigator.pop(context);
-                }
-              },
-              child: Text("Donate"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _processBkashPayment(String amount) async {
-    if (amount.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter an amount to proceed with bKash payment.")),
-      );
-      return;
-    }
-
-    // Official bKash payment link
-    final String bkashPaymentUrl = "https://bka.sh/next";
-
-    try {
-      // Use url_launcher to open the bKash payment URL
-      if (await canLaunch(bkashPaymentUrl)) {
-        await launch(bkashPaymentUrl);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Could not open bKash. Please make sure the app is installed or try again.")),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An error occurred: ${e.toString()}")),
-      );
-    }
   }
 }
